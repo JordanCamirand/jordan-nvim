@@ -8,9 +8,7 @@ return {
     dashboard = {
       enabled = true,
       preset = {
-        keys = {
-          { icon = ' ', key = 's', desc = 'Restore Session', section = 'session', hidden = true },
-        },
+        keys = {},
         header = [[
 ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
 ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║
@@ -22,7 +20,6 @@ return {
       sections = {
         { section = 'header' },
         { section = 'terminal', cmd = 'fortune -s | cowsay -r', padding = 1, indent = 8, ttl = 0, height = 20 },
-        { section = 'keys', gap = 1, padding = 1 },
       },
     },
     explorer = { enabled = false },
@@ -31,6 +28,11 @@ return {
     picker = {
       enabled = true,
       layout = { preset = 'telescope' },
+      sources = {
+        explorer = {
+          auto_close = true,
+        },
+      },
       win = {
         preview = {
           wo = {
