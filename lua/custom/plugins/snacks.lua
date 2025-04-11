@@ -27,6 +27,8 @@ return {
     input = { enabled = true },
     picker = {
       enabled = true,
+      matcher = { ignorecase = true },
+
       layout = { preset = 'telescope' },
       sources = {
         explorer = {

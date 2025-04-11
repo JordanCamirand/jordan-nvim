@@ -28,6 +28,8 @@ return {
     signature = { enabled = true },
     keymap = { preset = 'enter' },
 
+    cmdline = { enabled = false },
+
     appearance = {
       -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
       -- Adjusts spacing to ensure icons are aligned

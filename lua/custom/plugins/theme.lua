@@ -26,7 +26,6 @@ if theme_name == 'ayu' then
   return {
     'Shatur/neovim-ayu',
     priority = 1000,
-    dir = '/Users/jordan/code/personal/neovim-ayu/',
     opts = {
       mirage = false,
       overrides = {
