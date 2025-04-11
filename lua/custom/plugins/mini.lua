@@ -9,6 +9,7 @@ return { -- Collection of various small independent plugins/modules
     --  - ci'  - [C]hange [I]nside [']quote
     require('mini.ai').setup { n_lines = 500 }
 
+    -- require('mini.statusline').setup()
     require('mini.sessions').setup {}
 
     -- Add/delete/replace surroundings (brackets, quotes, etc.)
@@ -71,7 +72,7 @@ return { -- Collection of various small independent plugins/modules
     }
 
     vim.keymap.set('n', '<leader>if', function()
-      function file_exists(file)
+      local function file_exists(file)
         local f = io.open(file, 'rb')
         if f then
           f:close()
@@ -79,7 +80,7 @@ return { -- Collection of various small independent plugins/modules
         return f ~= nil
       end
 
-      filename = vim.api.nvim_buf_get_name(0)
+      local filename = vim.api.nvim_buf_get_name(0)
 
       if file_exists(filename) then
         MiniFiles.open(filename)

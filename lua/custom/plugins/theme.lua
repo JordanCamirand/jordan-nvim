@@ -47,6 +47,73 @@ if theme_name == 'ayu' then
   }
 end
 
+if theme_name == 'jellybeans' then
+  return {
+    'wtfox/jellybeans.nvim',
+    lazy = false,
+    priority = 1000,
+    opts = {},
+  }
+end
+
+if theme_name == 'sonokai' then
+  return {
+    'sainnhe/sonokai',
+    priority = 1000,
+    config = function()
+      -- vim.g.sonokai_enable_italic = true
+      vim.g.sonokai_style = 'espresso'
+
+      vim.cmd.colorscheme 'sonokai'
+    end,
+  }
+end
+
+if theme_name == 'tokyodark' then
+  return {
+    'tiagovla/tokyodark.nvim',
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme 'tokyodark'
+    end,
+  }
+end
+
+if theme_name == 'zenbones' then
+  return {
+    'zenbones-theme/zenbones.nvim',
+    dependencies = 'rktjmp/lush.nvim',
+    priority = 1000,
+    config = function()
+      -- zenwritten	Zero hue and saturation version
+      -- neobones	Inspired by neovim.io
+      -- vimbones	Inspired by vim.org
+      -- rosebones	Inspired by Rosé Pine
+      -- forestbones	Inspired by Everforest
+      -- nordbones	Inspired by Nord
+      -- tokyobones	Inspired by Tokyo Night
+      -- seoulbones	Inspired by Seoul256
+      -- duckbones	Inspired by Spaceduck
+      -- zenburned	Inspired by Zenburn
+      -- kanagawabones	Inspired by Kanagawa
+      -- randombones	Randomly pick from the collection.
+      -- vim.g.sonokai_enable_italic = true
+
+      vim.cmd.colorscheme 'duckbones'
+    end,
+  }
+end
+
+if theme_name == 'oxocarbon' then
+  return {
+    'nyoom-engineering/oxocarbon.nvim',
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme 'oxocarbon'
+    end,
+  }
+end
+
 if theme_name == 'tokyo' then
   return {
     'folke/tokyonight.nvim',

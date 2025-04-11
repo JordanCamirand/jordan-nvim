@@ -1,7 +1,6 @@
 return {
   'MagicDuck/grug-far.nvim',
   keys = {
-
     {
       '<leader>ir',
       mode = { 'n' },

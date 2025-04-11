@@ -144,6 +144,13 @@ return {
       desc = 'Buffer Lines',
     },
     {
+      '<leader>sc',
+      function()
+        Snacks.picker.commands()
+      end,
+      desc = 'Commands',
+    },
+    {
       '<leader>sd',
       function()
         Snacks.picker.diagnostics()
@@ -231,16 +238,9 @@ return {
     {
       '<leader>ss',
       function()
-        Snacks.picker.lsp_symbols()
+        Snacks.picker.pickers()
       end,
-      desc = 'LSP Symbols',
-    },
-    {
-      '<leader>sS',
-      function()
-        Snacks.picker.lsp_workspace_symbols()
-      end,
-      desc = 'LSP Workspace Symbols',
+      desc = 'Snacks',
     },
   },
 }
