@@ -5,4 +5,3 @@ nvim
 backup_init.lua
 
 spell/
-lazy-lock.json

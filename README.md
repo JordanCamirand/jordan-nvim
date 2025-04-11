@@ -11,3 +11,8 @@ Most important plugins:
 - Gitsigns for on demand git blame and resetting of hunks and buffers
 - Gp for on demand AI but not without constant AI suggestions
 - Git diff view (self explanatory)
+
+Things to install first outside of neovim
+- fortune (dashboard)
+- cowsay (dashboard)
+- ripgrep (grugfar, and a couple others)
