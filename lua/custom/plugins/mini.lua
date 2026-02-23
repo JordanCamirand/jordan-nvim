@@ -74,9 +74,7 @@ return { -- Collection of various small independent plugins/modules
     vim.keymap.set('n', '<leader>if', function()
       local function file_exists(file)
         local f = io.open(file, 'rb')
-        if f then
-          f:close()
-        end
+        if f then f:close() end
         return f ~= nil
       end
 
@@ -88,9 +86,5 @@ return { -- Collection of various small independent plugins/modules
         MiniFiles.open()
       end
     end, { desc = '[I]ntegrated [F]ile explorer (Current file)' })
-
-    vim.keymap.set('n', '<leader>iF', function()
-      MiniFiles.open()
-    end, { desc = '[I]ntegrated [F]ile explorer (Project root)' })
   end,
 }

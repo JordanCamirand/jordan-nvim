@@ -1,92 +1,44 @@
--- Set <space> as the leader keyinit NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
-vim.g.mapleader = ' '
+vim.g.mapleader = ' ' -- Set <space> as the leader keyinit  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.maplocalleader = ' '
--- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
-
--- [[ Setting options ]]
--- Make line numbers off by default, can set on when needed with :set number
--- Since I use flash by default
-vim.opt.number = false
-
--- Enable mouse mode, can be useful for resizing splits for example!
--- vim.opt.mouse = 'a'
-
--- Don't show the mode, since it's already in the status line
-vim.opt.showmode = false
-
+vim.opt.number = false -- Make line numbers off by default, can set on when needed with :set number
+vim.opt.showmode = false -- Don't show the mode, since it's already in the status line
+vim.opt.winborder = 'rounded'
 vim.opt.wrap = false
-
---  Remove this option if you want your OS clipboard to remain independent.
-vim.opt.clipboard = 'unnamedplus'
-
--- Enable break indent
+vim.opt.clipboard = 'unnamedplus' --  Remove this option if you want your OS clipboard to remain independent.
 vim.opt.breakindent = true
-
--- Save undo history
-vim.opt.undofile = true
-
--- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
-vim.opt.ignorecase = true
+vim.opt.undofile = true -- Save undo history
+vim.opt.ignorecase = true -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.smartcase = true
-
--- Keep signcolumn on by default
 vim.opt.signcolumn = 'yes'
-
--- Decrease update time
-vim.opt.updatetime = 250
-
--- Decrease mapped sequence wait time
--- Displays which-key popup sooner
-vim.opt.timeoutlen = 300
-
--- Configure how new splits should be opened
-vim.opt.splitright = true
-vim.opt.splitbelow = true
-
--- Sets how neovim will display certain whitespace characters in the editor.
---  See `:help 'list'`
---  and `:help 'listchars'`
-vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = ' ', nbsp = '␣' }
-
--- Preview substitutions live, as you type!
-vim.opt.inccommand = 'split'
-
--- Stop neovim from showing "~" on the start of every row after the last line in the file
-vim.opt.fillchars = { eob = ' ' }
-
--- Show which line your cursor is on
-vim.opt.cursorline = true
-
--- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
-
--- By default it shows you the last command you typed. By having this off lualine sits at the very bottom right
-vim.opt.cmdheight = 0
-
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
-
--- Set highlight on search, but clear on pressing <Esc> in normal mode
-vim.opt.hlsearch = true
-
+vim.opt.updatetime = 250 -- Decrease update time
+vim.opt.timeoutlen = 300 -- Decrease mapped sequence wait time Displays which-key popup sooner
+vim.opt.splitright = true -- Configure how new splits should be opened
+vim.opt.list = true --  See `:help 'list'`
+vim.opt.listchars = { tab = '» ', trail = ' ', nbsp = '␣' } --  See `:help 'listchars'`
+vim.opt.inccommand = 'split' -- Preview substitutions live, as you type!
+vim.opt.fillchars = { eob = ' ' } -- Stop neovim from showing "~" on the start of every row after the last line in the file
+vim.opt.cursorline = true -- Show which line your cursor is on
+vim.opt.scrolloff = 10 -- Minimal number of screen lines to keep above and below the cursor.
+vim.opt.cmdheight = 0 -- By default it shows you the last command you typed. By having this off the statusline sits at the very bottom right
+vim.opt.hlsearch = true -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.foldtext = 'v:lua.vim.treesitter.foldtext()'
+
+require('custom.statusline').setup()
+require('custom.todo-highlights').setup()
+require('custom.format').setup()
+require('custom.gutter-marks').setup()
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-  callback = function()
-    vim.highlight.on_yank()
-  end,
+  callback = function() vim.highlight.on_yank() end,
 })
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'csv',
   desc = 'Enable CSV View on .csv files',
-  callback = function()
-    require('csvview').enable()
-  end,
+  callback = function() require('csvview').enable() end,
 })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
@@ -99,14 +51,6 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-  'tweekmonster/django-plus.vim',
-
-  -- Use `opts = {}` to force a plugin to be loaded.
-  --
-  --  This is equivalent to:
-  --    require('Comment').setup({})
-
   { import = 'custom.plugins' },
 }, {
   ui = {
@@ -137,52 +81,41 @@ require('lazy').setup({
 
 vim.api.nvim_set_keymap('n', '<Leader>w', '<C-w>', { desc = '[W]indow management' })
 
--- vim.api.nvim_set_keymap('n', '<Leader>w', ':wincmd<Space>', opts?)
-vim.api.nvim_create_user_command('CopyRelativePath', function()
-  local path = vim.fn.expand '%'
-  vim.fn.setreg('+', path)
-  vim.notify('Copied "' .. path .. '" to the clipboard!')
-end, {})
+-- 'vim.lsp.enable' tells neovim to start the LSP when it sees a matching filetype
+-- to see active/enabled LSPs and their config run :LspInfo
+-- this does *not* auto install LSPs, Use mise-en-place outside of neovim to install
+vim.lsp.enable 'bashls'
+vim.lsp.enable 'ts_go_ls'
+vim.lsp.enable 'gleam'
+vim.lsp.enable 'rust_analyzer'
+vim.lsp.enable 'pyright'
+vim.lsp.enable 'html'
+vim.lsp.enable 'lua_ls'
 
-vim.api.nvim_create_user_command('Redir', function(ctx)
-  local lines = vim.split(vim.api.nvim_exec(ctx.args, true), '\n', { plain = true })
-  vim.cmd 'enew | setlocal buftype=nofile'
-  vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
-  vim.opt_local.modified = false
-end, { nargs = '+', complete = 'command' })
+vim.keymap.set('n', '<leader>lh', vim.lsp.buf.hover, { desc = '[L]anguage [H]over' })
+vim.keymap.set('n', '<leader>le', vim.diagnostic.open_float, { desc = '[L]anguage [E]rror' })
+vim.keymap.set('n', '<leader>lrn', vim.lsp.buf.rename, { desc = '[R]e[n]ame' })
+vim.keymap.set('n', '<leader>la', vim.lsp.buf.code_action, { desc = '[L]anguage [A]ction' })
 
-vim.api.nvim_create_user_command('CurLsp', function()
-  vim.cmd 'Redir lua=vim.inspect(vim.lsp.get_active_clients())'
-end, {})
+vim.keymap.set('n', '<leader>lrb', function()
+  vim.cmd ':LspStop'
+  vim.cmd ':w'
+  vim.cmd ':e' -- refresh the buffer re-triggers LSPs to start
+end, { desc = '[L]anguage [R]e[B]oot' })
 
-vim.api.nvim_create_user_command('NewTerminal', function()
-  local term_count = 0
-  while true do
-    local term_name = 'Term' .. term_count
+vim.api.nvim_create_user_command('LspInfo', function() vim.cmd 'checkhealth vim.lsp' end, { desc = 'Show LSP info via checkhealth' })
 
-    local repeat_name = false
-
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_get_name(buf) == term_name then
-        repeat_name = true
-        break
-      end
-    end
-    if not repeat_name then
-      vim.cmd(':file ' .. term_name)
-      return
-    end
-  end
-end, {})
-
-vim.api.nvim_create_user_command('DeleteCurrentFile', function()
-  vim.cmd('!rm ' .. vim.fn.shellescape(vim.fn.expand '%'))
-end, { nargs = 0 })
-
-vim.api.nvim_create_user_command('DeleteAndCloseCurrentFile', function()
-  vim.cmd('!rm ' .. vim.fn.shellescape(vim.fn.expand '%'))
-  vim.cmd 'bdelete!'
-end, { nargs = 0 })
+vim.filetype.add {
+  extension = {
+    env = 'sh',
+    zsh = 'sh',
+    sh = 'sh', -- force sh-files with zsh-shebang to still get sh as filetype
+  },
+  filename = {
+    ['.zshrc'] = 'sh',
+    ['.zshenv'] = 'sh',
+  },
+}
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
@@ -195,13 +128,10 @@ vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 vim.keymap.set('n', '<CR>', '<cmd>echo "Dont use enter in normal mode"<CR>')
 vim.keymap.set('n', 'q', '<cmd>echo "disabled q to stop recording mishaps"<CR>')
 
--- Convenience
-
 local function normal_and_visual_keymap(letter, mapping, desc)
   vim.keymap.set('n', letter, mapping, { desc = desc })
   vim.keymap.set('v', letter, mapping, { desc = desc })
 end
-
 normal_and_visual_keymap('J', '10j', 'Jump 10 down')
 normal_and_visual_keymap('K', '10k', 'Jump 10 up')
 normal_and_visual_keymap('H', '^', 'Jump to start of line')
@@ -212,9 +142,5 @@ normal_and_visual_keymap('x', '"_x', 'Make delete 1 character leave clipboard al
 vim.api.nvim_set_keymap('n', 'z', '<C-o>', {})
 vim.api.nvim_set_keymap('n', 'Z', '<C-i>', {})
 
-vim.keymap.set('n', '<leader>it', ':term<CR>:file term<CR>a', { desc = '[I]ntegrated [T]erminal' })
-
 vim.keymap.set('n', 'cx', 'r') -- keep all changes under c
 vim.keymap.set('c', 'Q', 'q') -- fix typos of Capital Q
-
-vim.keymap.set('n', '<leader>lh', vim.lsp.buf.hover, { desc = '[L]anguage [H]over' })

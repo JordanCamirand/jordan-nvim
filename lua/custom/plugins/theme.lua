@@ -26,6 +26,7 @@ if theme_name == 'ayu' then
   return {
     'Shatur/neovim-ayu',
     priority = 1000,
+    dir = '/Users/jordan/code/personal/neovim-ayu/',
     opts = {
       mirage = false,
       overrides = {
@@ -46,14 +47,12 @@ if theme_name == 'ayu' then
   }
 end
 
-if theme_name == 'jellybeans' then
-  return {
-    'wtfox/jellybeans.nvim',
-    lazy = false,
-    priority = 1000,
-    opts = {},
-  }
-end
+if theme_name == 'jellybeans' then return {
+  'wtfox/jellybeans.nvim',
+  lazy = false,
+  priority = 1000,
+  opts = {},
+} end
 
 if theme_name == 'sonokai' then
   return {
@@ -68,15 +67,11 @@ if theme_name == 'sonokai' then
   }
 end
 
-if theme_name == 'tokyodark' then
-  return {
-    'tiagovla/tokyodark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'tokyodark'
-    end,
-  }
-end
+if theme_name == 'tokyodark' then return {
+  'tiagovla/tokyodark.nvim',
+  priority = 1000,
+  config = function() vim.cmd.colorscheme 'tokyodark' end,
+} end
 
 if theme_name == 'zenbones' then
   return {
@@ -107,9 +102,7 @@ if theme_name == 'oxocarbon' then
   return {
     'nyoom-engineering/oxocarbon.nvim',
     priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'oxocarbon'
-    end,
+    config = function() vim.cmd.colorscheme 'oxocarbon' end,
   }
 end
 

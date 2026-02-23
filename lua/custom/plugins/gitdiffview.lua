@@ -5,9 +5,7 @@ return {
     {
       '<leader>ig',
       mode = { 'n' },
-      function()
-        require('diffview').open()
-      end,
+      function() require('diffview').open() end,
       desc = '[I]ntegrated [G]it',
     },
   },

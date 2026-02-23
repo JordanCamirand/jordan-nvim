@@ -1,7 +1,126 @@
+-- Global bookmark list PER repo. Sounds weird but that way you can do whatever shenanigans with multiple clones of the same repo and it will work
+local function open_bookmarks()
+  local git_root = vim.fn.systemlist('git -C ' .. vim.fn.shellescape(vim.fn.expand '%:p:h') .. ' rev-parse --show-toplevel')[1]
+  if vim.v.shell_error ~= 0 or not git_root then
+    vim.notify('Not in a git repo', vim.log.levels.WARN)
+    return
+  end
+  local repo_name = vim.fn.fnamemodify(git_root, ':t')
+  local bookmarks_file = vim.fn.expand('~/jordan-nvim-bookmarks/' .. repo_name .. '-bookmark.txt')
+
+  if vim.fn.filereadable(bookmarks_file) == 0 then
+    vim.fn.mkdir(vim.fn.expand '~/jordan-nvim-bookmarks', 'p')
+    vim.fn.writefile({}, bookmarks_file)
+  end
+
+  Snacks.picker.pick {
+    title = repo_name .. ' Bookmarks',
+    finder = function()
+      local lines = vim.fn.readfile(bookmarks_file)
+      local items = {}
+      for _, line in ipairs(lines) do
+        if line ~= '' then
+          local sep_pos = line:find ';'
+          if sep_pos then
+            local description = line:sub(1, sep_pos - 1)
+            local path = line:sub(sep_pos + 1)
+            if not path:match '^[~/]' then path = git_root .. '/' .. path end
+            table.insert(items, {
+              text = description,
+              file = vim.fn.expand(path),
+              pos = { 1, 0 },
+            })
+          else
+            local path = line
+            if not path:match '^[~/]' then path = git_root .. '/' .. path end
+            table.insert(items, {
+              text = line,
+              file = vim.fn.expand(path),
+              pos = { 1, 0 },
+            })
+          end
+        end
+      end
+      table.insert(items, {
+        text = repo_name .. '-bookmark.txt',
+        file = bookmarks_file,
+        pos = { 1, 0 },
+      })
+      return items
+    end,
+    format = 'text',
+  }
+end
+
+local function paste_file_path()
+  Snacks.picker.files {
+    hidden = true,
+    confirm = function(picker, item)
+      picker:close()
+      if item then vim.api.nvim_put({ item.file }, '', true, true) end
+    end,
+  }
+end
+
+local function open_toolbox()
+  local commands = {
+    {
+      name = 'Copy relative path to clipboard',
+      execute = function()
+        local path = vim.fn.expand '%'
+        vim.fn.setreg('+', path)
+      end,
+    },
+    { name = 'Git blame', execute = 'Gitsigns blame' },
+    { name = 'Git revert/reset hunk', execute = 'Gitsigns reset_hunk' },
+    { name = 'Git revert/reset buffer', execute = 'Gitsigns reset_buffer' },
+    { name = 'Git stash search', execute = 'lua Snacks.picker.git_stash()' },
+    { name = 'Scratch buffer', execute = 'lua Snacks.scratch()' },
+    { name = 'Search Commands', execute = 'lua Snacks.picker.commands()' },
+    { name = 'Search text no regex', execute = 'lua Snacks.picker.grep({regex = false})' },
+    {
+      name = 'Copy absolute path to clipboard',
+      execute = function()
+        local path = vim.fn.expand '%:p'
+        vim.fn.setreg('+', path)
+      end,
+    },
+  }
+
+  Snacks.picker.pick {
+    title = 'Toolbox',
+    layout = { preset = 'select' },
+    finder = function()
+      local items = {}
+      for idx, cmd in ipairs(commands) do
+        table.insert(items, {
+          text = cmd.name,
+          idx = idx,
+          cmd = cmd,
+        })
+      end
+      return items
+    end,
+    format = 'text',
+    confirm = function(picker, item)
+      picker:close()
+      if item then
+        local exec = item.cmd.execute
+        if type(exec) == 'function' then
+          exec()
+        else
+          vim.cmd(exec)
+        end
+      end
+    end,
+  }
+end
+
 return {
   'folke/snacks.nvim',
   priority = 1000,
   lazy = false,
+  ---@module 'snacks'
   ---@type snacks.Config
   opts = {
     bigfile = { enabled = true },
@@ -22,7 +141,7 @@ return {
         { section = 'terminal', cmd = 'fortune -s | cowsay -r', padding = 1, indent = 8, ttl = 0, height = 20 },
       },
     },
-    explorer = { enabled = false },
+    explorer = { enabled = true, replace_netrw = false },
     indent = { enabled = false },
     input = { enabled = true },
     picker = {
@@ -33,6 +152,9 @@ return {
       sources = {
         explorer = {
           auto_close = true,
+          layout = {
+            preview = 'main',
+          },
         },
       },
       win = {
@@ -48,6 +170,7 @@ return {
     },
     notifier = { enabled = true },
     quickfile = { enabled = false },
+    scratch = { enabled = true },
     scope = { enabled = false },
     scroll = { enabled = false },
     statuscolumn = { enabled = false },
@@ -55,194 +178,29 @@ return {
   },
   keys = {
     -- Top Pickers & Explorer
-    {
-      '<leader><leader>',
-      function()
-        Snacks.picker.smart()
-      end,
-      desc = 'Smart Find Files',
-    },
-    {
-      '<leader>so',
-      function()
-        Snacks.picker.buffers()
-      end,
-      desc = 'Buffers',
-    },
-    {
-      '<leader>sp',
-      function()
-        Snacks.picker.grep()
-      end,
-      desc = 'Grep',
-    },
-
-    {
-      '<leader>sf',
-      function()
-        Snacks.picker.files()
-      end,
-      desc = '[S]earch [F]iles',
-    },
-    {
-      '<leader>se',
-      function()
-        Snacks.picker.files {
-          hidden = true,
-          ignored = true,
-          title = 'Everything',
-        }
-      end,
-      desc = 'Everything',
-    },
-    {
-      '<leader>sgs',
-      function()
-        Snacks.picker.git_status()
-      end,
-      desc = '[G]it [S]tatus',
-    },
-    {
-      '<leader>sgt',
-      function()
-        Snacks.picker.git_stash()
-      end,
-      desc = '[G]it s[T]ash',
-    },
-    {
-      '<leader>sb',
-      function()
-        Snacks.picker.lines()
-      end,
-      desc = 'Buffer Lines',
-    },
-    {
-      '<leader>sB',
-      function()
-        Snacks.picker.grep_buffers()
-      end,
-      desc = 'Grep Open Buffers',
-    },
-    {
-      '<leader>sw',
-      function()
-        Snacks.picker.grep_word()
-      end,
-      desc = 'Visual selection or word',
-      mode = { 'n', 'x' },
-    },
-    {
-      '<leader>s"',
-      function()
-        Snacks.picker.registers()
-      end,
-      desc = 'Registers',
-    },
-    {
-      '<leader>sb',
-      function()
-        Snacks.picker.lines()
-      end,
-      desc = 'Buffer Lines',
-    },
-    {
-      '<leader>sc',
-      function()
-        Snacks.picker.commands()
-      end,
-      desc = 'Commands',
-    },
-    {
-      '<leader>sd',
-      function()
-        Snacks.picker.diagnostics()
-      end,
-      desc = 'Diagnostics',
-    },
-    {
-      '<leader>sD',
-      function()
-        Snacks.picker.diagnostics_buffer()
-      end,
-      desc = 'Buffer Diagnostics',
-    },
-    {
-      '<leader>sh',
-      function()
-        Snacks.picker.help()
-      end,
-      desc = 'Help Pages',
-    },
-    {
-      '<leader>sH',
-      function()
-        Snacks.picker.highlights()
-      end,
-      desc = 'Highlights',
-    },
-    {
-      '<leader>sk',
-      function()
-        Snacks.picker.keymaps()
-      end,
-      desc = 'Keymaps',
-    },
-    {
-      '<leader>sq',
-      function()
-        Snacks.picker.qflist()
-      end,
-      desc = 'Quickfix List',
-    },
-    {
-      '<leader>sr',
-      function()
-        Snacks.picker.resume()
-      end,
-      desc = 'Resume',
-    },
-    {
-      'gd',
-      function()
-        Snacks.picker.lsp_definitions()
-      end,
-      desc = 'Goto Definition',
-    },
-    {
-      'gD',
-      function()
-        Snacks.picker.lsp_declarations()
-      end,
-      desc = 'Goto Declaration',
-    },
-    {
-      'gr',
-      function()
-        Snacks.picker.lsp_references()
-      end,
-      nowait = true,
-      desc = 'References',
-    },
-    {
-      'gI',
-      function()
-        Snacks.picker.lsp_implementations()
-      end,
-      desc = 'Goto Implementation',
-    },
-    {
-      'gy',
-      function()
-        Snacks.picker.lsp_type_definitions()
-      end,
-      desc = 'Goto T[y]pe Definition',
-    },
-    {
-      '<leader>ss',
-      function()
-        Snacks.picker.pickers()
-      end,
-      desc = 'Snacks',
-    },
+    { '<leader><leader>', function() Snacks.picker.smart() end, desc = 'Smart Find Files' },
+    { '<leader>sf', function() Snacks.picker.files { hidden = true } end, desc = '[S]earch [F]iles' },
+    { '<leader>so', function() Snacks.picker.buffers() end, desc = 'Buffers' },
+    { '<leader>sp', function() Snacks.picker.grep() end, desc = 'Grep' },
+    { '<leader>sP', function() Snacks.picker.grep { regex = false } end, desc = 'Grep ' },
+    { '<leader>sgs', function() Snacks.picker.git_status() end, desc = '[G]it [S]tatus' },
+    { '<leader>sb', function() Snacks.picker.lines() end, desc = 'Buffer Lines' },
+    { '<leader>sc', function() Snacks.picker.commands() end, desc = 'Commands' },
+    { '<leader>sd', function() Snacks.picker.diagnostics() end, desc = 'Diagnostics' },
+    { '<leader>sD', function() Snacks.picker.diagnostics_buffer() end, desc = 'Buffer Diagnostics' },
+    { '<leader>sh', function() Snacks.picker.help() end, desc = 'Help Pages' },
+    { '<leader>sk', function() Snacks.picker.keymaps() end, desc = 'Keymaps' },
+    { '<leader>sr', function() Snacks.picker.resume() end, desc = 'Resume' },
+    { '<leader>ss', function() Snacks.picker.pickers() end, desc = 'Snacks' },
+    { '<leader>se', function() Snacks.picker.files { hidden = true, ignored = true, title = 'Everything' } end, desc = 'Everything' },
+    { '<leader>st', open_toolbox, desc = '[S]earch [T]oolbox', mode = { 'n', 'v' } },
+    { '<leader>iF', function() Snacks.picker.explorer { hidden = true, ignored = true } end, desc = 'File tree' },
+    { 'gd', function() Snacks.picker.lsp_definitions() end, desc = 'Goto Definition' },
+    { 'gD', function() Snacks.picker.lsp_declarations() end, desc = 'Goto Declaration' },
+    { 'gr', function() Snacks.picker.lsp_references() end, nowait = true, desc = 'References' },
+    { 'gI', function() Snacks.picker.lsp_implementations() end, desc = 'Goto Implementation' },
+    { 'gy', function() Snacks.picker.lsp_type_definitions() end, desc = 'Goto T[y]pe Definition' },
+    { ';', open_bookmarks, desc = 'Bookmarks' },
+    { '<leader>a', paste_file_path, desc = 'Paste file path' },
   },
 }
