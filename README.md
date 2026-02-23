@@ -23,3 +23,6 @@ However this configuration is very far from that.
 
 ## TODO
 - When next neovim version comes out replace lazy plugin manager with `vim.pack`
+
+## LSP management
+- I now use 'mise-en-place' to manage LSPs and many other versioned things on my computer, but Mason is a fine alternative
