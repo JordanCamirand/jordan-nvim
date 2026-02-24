@@ -7,11 +7,11 @@ local M = {}
 local ns = api.nvim_create_namespace 'gutter-marks'
 
 local sign_map = {
-  add = { text = '+', hl = 'Added' },
-  change = { text = '~', hl = 'Changed' },
-  delete = { text = '_', hl = 'Removed' },
-  topdelete = { text = '‾', hl = 'Removed' },
-  changedelete = { text = '~', hl = 'Changed' },
+  add = { text = '▎', hl = 'Added' },
+  change = { text = '▎', hl = 'Changed' },
+  delete = { text = '▁', hl = 'Removed' },
+  topdelete = { text = '▔', hl = 'Removed' },
+  changedelete = { text = '▎', hl = 'Changed' },
 }
 
 local function git_file_content(bufnr)
