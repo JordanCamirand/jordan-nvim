@@ -24,10 +24,13 @@ vim.opt.cmdheight = 0 -- By default it shows you the last command you typed. By 
 vim.opt.hlsearch = true -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.opt.foldtext = 'v:lua.vim.treesitter.foldtext()'
 
+require('custom.theme').setup()
 require('custom.statusline').setup()
 require('custom.todo-highlights').setup()
 require('custom.format').setup()
 require('custom.gutter-marks').setup()
+require('custom.sleuth').setup()
+require('custom.autoclose').setup()
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
@@ -80,6 +83,10 @@ require('lazy').setup({
 })
 
 vim.api.nvim_set_keymap('n', '<Leader>w', '<C-w>', { desc = '[W]indow management' })
+
+-- The main branch of nvim-treesitter is just a parser manager;
+-- it no longer auto-enables highlighting. Enable it for all filetypes with a parser.
+vim.api.nvim_create_autocmd('FileType', { callback = function() pcall(vim.treesitter.start) end })
 
 -- 'vim.lsp.enable' tells neovim to start the LSP when it sees a matching filetype
 -- to see active/enabled LSPs and their config run :LspInfo
