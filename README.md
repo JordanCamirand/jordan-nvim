@@ -17,9 +17,10 @@ However this configuration is very far from that.
 - Git diff view (self explanatory)
 
 ## Things to install first outside of neovim
-- fortune (dashboard)
-- cowsay (dashboard)
+- tree-sitter-cli (tree sitter)
 - ripgrep (grugfar, and a couple others)
+- fortune (dashboard)
+- cowsay (dashboard) 
 
 ## TODO
 - When next neovim version comes out replace lazy plugin manager with `vim.pack`
