@@ -116,92 +116,88 @@ local function open_toolbox()
   }
 end
 
-return {
-  'folke/snacks.nvim',
-  priority = 1000,
-  lazy = false,
-  ---@module 'snacks'
-  ---@type snacks.Config
-  opts = {
-    bigfile = { enabled = true },
-    dashboard = {
-      enabled = true,
-      preset = {
-        keys = {},
-        header = [[
+---@module 'snacks'
+---@type snacks.Config
+require('snacks').setup {
+  bigfile = { enabled = true },
+  dashboard = {
+    enabled = true,
+    preset = {
+      keys = {},
+      header = [[
 ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
 ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║
 ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║
 ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║
 ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║
 ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝]],
-      },
-      sections = {
-        { section = 'header' },
-        { section = 'terminal', cmd = 'fortune -s | cowsay -r', padding = 1, indent = 8, ttl = 0, height = 20 },
-      },
     },
-    explorer = { enabled = true, replace_netrw = false },
-    indent = { enabled = false },
-    input = { enabled = true },
-    picker = {
-      enabled = true,
-      matcher = { ignorecase = true },
+    sections = {
+      { section = 'header' },
+      { section = 'terminal', cmd = 'fortune -s | cowsay -r', padding = 1, indent = 8, ttl = 0, height = 20 },
+    },
+  },
+  explorer = { enabled = true, replace_netrw = false },
+  indent = { enabled = false },
+  input = { enabled = true },
+  picker = {
+    enabled = true,
+    matcher = { ignorecase = true },
 
-      layout = { preset = 'telescope' },
-      sources = {
-        explorer = {
-          auto_close = true,
-          layout = {
-            preview = 'main',
-          },
-        },
-      },
-      win = {
-        preview = {
-          wo = {
-            number = false,
-          },
-        },
-        input = {
-          minimal = true,
+    layout = { preset = 'telescope' },
+    sources = {
+      explorer = {
+        auto_close = true,
+        layout = {
+          preview = 'main',
         },
       },
     },
-    notifier = { enabled = true },
-    quickfile = { enabled = false },
-    scratch = { enabled = true },
-    scope = { enabled = false },
-    scroll = { enabled = false },
-    statuscolumn = { enabled = false },
-    words = { enabled = false },
+    win = {
+      preview = {
+        wo = {
+          number = false,
+        },
+      },
+      input = {
+        minimal = true,
+      },
+    },
   },
-  keys = {
-    -- Top Pickers & Explorer
-    { '<leader><leader>', function() Snacks.picker.smart() end, desc = 'Smart Find Files' },
-    { '<leader>sf', function() Snacks.picker.files { hidden = true } end, desc = '[S]earch [F]iles' },
-    { '<leader>so', function() Snacks.picker.buffers() end, desc = 'Buffers' },
-    { '<leader>sp', function() Snacks.picker.grep() end, desc = 'Grep' },
-    { '<leader>sP', function() Snacks.picker.grep { regex = false } end, desc = 'Grep ' },
-    { '<leader>sgs', function() Snacks.picker.git_status() end, desc = '[G]it [S]tatus' },
-    { '<leader>sgh', function() Snacks.picker.gh_pr() end, desc = 'Search GitHub' },
-    { '<leader>sb', function() Snacks.picker.lines() end, desc = 'Buffer Lines' },
-    { '<leader>sc', function() Snacks.picker.commands() end, desc = 'Commands' },
-    { '<leader>sd', function() Snacks.picker.diagnostics() end, desc = 'Diagnostics' },
-    { '<leader>sD', function() Snacks.picker.diagnostics_buffer() end, desc = 'Buffer Diagnostics' },
-    { '<leader>sh', function() Snacks.picker.help() end, desc = 'Help Pages' },
-    { '<leader>sk', function() Snacks.picker.keymaps() end, desc = 'Keymaps' },
-    { '<leader>sr', function() Snacks.picker.resume() end, desc = 'Resume' },
-    { '<leader>ss', function() Snacks.picker.pickers() end, desc = 'Snacks' },
-    { '<leader>se', function() Snacks.picker.files { hidden = true, ignored = true, title = 'Everything' } end, desc = 'Everything' },
-    { '<leader>st', open_toolbox, desc = '[S]earch [T]oolbox', mode = { 'n', 'v' } },
-    { '<leader>iF', function() Snacks.picker.explorer { hidden = true, ignored = true } end, desc = 'File tree' },
-    { 'gd', function() Snacks.picker.lsp_definitions() end, desc = 'Goto Definition' },
-    { 'gD', function() Snacks.picker.lsp_declarations() end, desc = 'Goto Declaration' },
-    { 'gr', function() Snacks.picker.lsp_references() end, nowait = true, desc = 'References' },
-    { 'gI', function() Snacks.picker.lsp_implementations() end, desc = 'Goto Implementation' },
-    { 'gy', function() Snacks.picker.lsp_type_definitions() end, desc = 'Goto T[y]pe Definition' },
-    { ';', open_bookmarks, desc = 'Bookmarks' },
-    { '<leader>a', paste_file_path, desc = 'Paste file path' },
-  },
+  notifier = { enabled = true },
+  quickfile = { enabled = false },
+  scratch = { enabled = true },
+  scope = { enabled = false },
+  scroll = { enabled = false },
+  statuscolumn = { enabled = false },
+  words = { enabled = false },
 }
+
+-- Top Pickers & Explorer
+vim.keymap.set('n', '<leader><leader>', function() Snacks.picker.smart() end, { desc = 'Smart Find Files' })
+vim.keymap.set('n', '<leader>sf', function() Snacks.picker.files { hidden = true } end, { desc = '[S]earch [F]iles' })
+vim.keymap.set('n', '<leader>so', function() Snacks.picker.buffers() end, { desc = 'Buffers' })
+vim.keymap.set('n', '<leader>sp', function() Snacks.picker.grep() end, { desc = 'Grep' })
+vim.keymap.set('n', '<leader>sP', function() Snacks.picker.grep { regex = false } end, { desc = 'Grep ' })
+vim.keymap.set('n', '<leader>sgs', function() Snacks.picker.git_status() end, { desc = '[G]it [S]tatus' })
+vim.keymap.set('n', '<leader>sgh', function() Snacks.picker.gh_pr() end, { desc = 'Search GitHub' })
+vim.keymap.set('n', '<leader>sb', function() Snacks.picker.lines() end, { desc = 'Buffer Lines' })
+vim.keymap.set('n', '<leader>sc', function() Snacks.picker.commands() end, { desc = 'Commands' })
+vim.keymap.set('n', '<leader>sd', function() Snacks.picker.diagnostics() end, { desc = 'Diagnostics' })
+vim.keymap.set('n', '<leader>sD', function() Snacks.picker.diagnostics_buffer() end, { desc = 'Buffer Diagnostics' })
+vim.keymap.set('n', '<leader>sh', function() Snacks.picker.help() end, { desc = 'Help Pages' })
+vim.keymap.set('n', '<leader>sk', function() Snacks.picker.keymaps() end, { desc = 'Keymaps' })
+vim.keymap.set('n', '<leader>sr', function() Snacks.picker.resume() end, { desc = 'Resume' })
+vim.keymap.set('n', '<leader>ss', function() Snacks.picker.pickers() end, { desc = 'Snacks' })
+vim.keymap.set('n', '<leader>se', function() Snacks.picker.files { hidden = true, ignored = true, title = 'Everything' } end, { desc = 'Everything' })
+vim.keymap.set({ 'n', 'v' }, '<leader>st', open_toolbox, { desc = '[S]earch [T]oolbox' })
+vim.keymap.set('n', '<leader>iF', function() Snacks.picker.explorer { hidden = true, ignored = true } end, { desc = 'File tree' })
+-- LSP pickers
+vim.keymap.set('n', 'gd', function() Snacks.picker.lsp_definitions() end, { desc = 'Goto Definition' })
+vim.keymap.set('n', 'gD', function() Snacks.picker.lsp_declarations() end, { desc = 'Goto Declaration' })
+vim.keymap.set('n', 'gr', function() Snacks.picker.lsp_references() end, { nowait = true, desc = 'References' })
+vim.keymap.set('n', 'gI', function() Snacks.picker.lsp_implementations() end, { desc = 'Goto Implementation' })
+vim.keymap.set('n', 'gy', function() Snacks.picker.lsp_type_definitions() end, { desc = 'Goto T[y]pe Definition' })
+-- Bookmarks & file path
+vim.keymap.set('n', ';', open_bookmarks, { desc = 'Bookmarks' })
+vim.keymap.set('n', '<leader>a', paste_file_path, { desc = 'Paste file path' })

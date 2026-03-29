@@ -1,3 +1,4 @@
+vim.loader.enable()
 vim.g.mapleader = ' ' -- Set <space> as the leader keyinit  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
@@ -44,21 +45,68 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function() require('csvview').enable() end,
 })
 
--- [[ Install `lazy.nvim` plugin manager ]]
---    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not vim.loop.fs_stat(lazypath) then
-  local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
-end ---@diagnostic disable-next-line: undefined-field
-vim.opt.rtp:prepend(lazypath)
-
-require('lazy').setup({
-  { import = 'custom.plugins' },
-}, {
-  ui = {},
-  change_detection = { enabled = false },
+-- Treesitter build hook (must be before vim.pack.add)
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+    if ev.data.spec.name == 'nvim-treesitter' then
+      if not ev.data.active then vim.cmd.packadd 'nvim-treesitter' end
+      vim.cmd 'TSUpdate'
+    end
+  end,
 })
+
+-- [[ Install plugins with vim.pack (Neovim 0.12 built-in package manager) ]]
+--    See `:help vim.pack` for more info
+--    Update plugins with `:lua vim.pack.update()`
+--    Plugin configs are in plugin/*.lua (auto-sourced after init.lua)
+vim.pack.add {
+  'https://github.com/folke/snacks.nvim',
+  { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '1.x' }, -- use a release tag to download pre-built binaries
+  'https://github.com/rafamadriz/friendly-snippets',
+  'https://github.com/folke/lazydev.nvim', -- configures Lua LSP for your Neovim config, runtime and plugins
+  { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' }, -- functions for installing, updating, and removing tree-sitter parsers
+  'https://github.com/folke/flash.nvim',
+  'https://github.com/echasnovski/mini.files',
+  'https://github.com/echasnovski/mini.ai', -- Better Around/Inside textobjects
+  'https://github.com/echasnovski/mini.surround', -- Add/delete/replace surroundings (brackets, quotes, etc.)
+  'https://github.com/sindrets/diffview.nvim', -- Diff integration
+  'https://github.com/MagicDuck/grug-far.nvim',
+  'https://github.com/hat0uma/csvview.nvim',
+}
+
+-- Better Around/Inside textobjects
+--  - va)  - [V]isually select [A]round [)]paren
+--  - yinq - [Y]ank [I]nside [N]ext [']quote
+--  - ci'  - [C]hange [I]nside [']quote
+require('mini.ai').setup { n_lines = 500 }
+
+-- Add/delete/replace surroundings (brackets, quotes, etc.)
+--  - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+--  - sd'   - [S]urround [D]elete [']quotes
+--  - sr)'  - [S]urround [R]eplace [)] [']
+require('mini.surround').setup {}
+
+-- Treesitter parser installation
+require('nvim-treesitter').install {
+  'bash',
+  'c',
+  'html',
+  'css',
+  'lua',
+  'luadoc',
+  'sql',
+  'json',
+  'terraform',
+  'rust',
+  'markdown',
+  'vim',
+  'vimdoc',
+  'just',
+  'elixir',
+  'typescript',
+  'tsx',
+  'javascript',
+}
 
 -- The main branch of nvim-treesitter is just a parser manager;
 -- it no longer auto-enables highlighting. Enable it for all filetypes with a parser.

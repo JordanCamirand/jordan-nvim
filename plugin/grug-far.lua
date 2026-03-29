@@ -36,29 +36,13 @@ local function getVisualSelectionLines()
   return lines, start_row, start_col, end_row, end_col
 end
 
-return {
-  'MagicDuck/grug-far.nvim',
-  keys = {
-    {
-      '<leader>ir',
-      mode = { 'n' },
-      function() require('grug-far').open() end,
-      desc = '[I]ntegrated [R]eplace',
-    },
-    {
-      '<leader>ir',
-      mode = { 'v' },
-      function()
-        local selectedText = getVisualSelectionLines()
-        local mergedSelectedText = table.concat(selectedText, '\n')
-        require('grug-far').with_visual_selection { prefills = { paths = vim.fn.expand '%', replacement = mergedSelectedText } }
-      end,
-      desc = '[I]ntegrated [R]eplace',
-    },
-  },
-  config = function()
-    require('grug-far').setup {
-      windowCreationCommand = 'tabnew %',
-    }
-  end,
+require('grug-far').setup {
+  windowCreationCommand = 'tabnew %',
 }
+
+vim.keymap.set('n', '<leader>ir', function() require('grug-far').open() end, { desc = '[I]ntegrated [R]eplace' })
+vim.keymap.set('v', '<leader>ir', function()
+  local selectedText = getVisualSelectionLines()
+  local mergedSelectedText = table.concat(selectedText, '\n')
+  require('grug-far').with_visual_selection { prefills = { paths = vim.fn.expand '%', replacement = mergedSelectedText } }
+end, { desc = '[I]ntegrated [R]eplace' })
