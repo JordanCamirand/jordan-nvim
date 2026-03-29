@@ -184,6 +184,7 @@ return {
     { '<leader>sp', function() Snacks.picker.grep() end, desc = 'Grep' },
     { '<leader>sP', function() Snacks.picker.grep { regex = false } end, desc = 'Grep ' },
     { '<leader>sgs', function() Snacks.picker.git_status() end, desc = '[G]it [S]tatus' },
+    { '<leader>sgh', function() Snacks.picker.gh_pr() end, desc = 'Search GitHub' },
     { '<leader>sb', function() Snacks.picker.lines() end, desc = 'Buffer Lines' },
     { '<leader>sc', function() Snacks.picker.commands() end, desc = 'Commands' },
     { '<leader>sd', function() Snacks.picker.diagnostics() end, desc = 'Diagnostics' },

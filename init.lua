@@ -12,7 +12,7 @@ vim.opt.ignorecase = true -- Case-insensitive searching UNLESS \C or one or more
 vim.opt.smartcase = true
 vim.opt.signcolumn = 'yes'
 vim.opt.updatetime = 250 -- Decrease update time
-vim.opt.timeoutlen = 300 -- Decrease mapped sequence wait time Displays which-key popup sooner
+vim.opt.timeout = false -- Never time out on mapped sequences so you can type as slow as you want for chords like <leader>sP
 vim.opt.splitright = true -- Configure how new splits should be opened
 vim.opt.list = true --  See `:help 'list'`
 vim.opt.listchars = { tab = '» ', trail = ' ', nbsp = '␣' } --  See `:help 'listchars'`
@@ -56,33 +56,9 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   { import = 'custom.plugins' },
 }, {
-  ui = {
-    -- If you are using a Nerd Font: set icons to an empty table which will use the
-    -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
-    icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
-    },
-  },
-  change_detection = {
-    -- automatically check for config file changes and reload the ui
-    enabled = false,
-    notify = true, -- get a notification when changes are found
-  },
+  ui = {},
+  change_detection = { enabled = false },
 })
-
-vim.api.nvim_set_keymap('n', '<Leader>w', '<C-w>', { desc = '[W]indow management' })
 
 -- The main branch of nvim-treesitter is just a parser manager;
 -- it no longer auto-enables highlighting. Enable it for all filetypes with a parser.
@@ -98,14 +74,16 @@ vim.lsp.enable 'rust_analyzer'
 vim.lsp.enable 'pyright'
 vim.lsp.enable 'html'
 vim.lsp.enable 'lua_ls'
+vim.lsp.enable 'terraformls'
 
+vim.api.nvim_set_keymap('n', '<Leader>w', '<C-w>', { desc = '[W]indow management' })
 vim.keymap.set('n', '<leader>lh', vim.lsp.buf.hover, { desc = '[L]anguage [H]over' })
 vim.keymap.set('n', '<leader>le', vim.diagnostic.open_float, { desc = '[L]anguage [E]rror' })
 vim.keymap.set('n', '<leader>lrn', vim.lsp.buf.rename, { desc = '[R]e[n]ame' })
 vim.keymap.set('n', '<leader>la', vim.lsp.buf.code_action, { desc = '[L]anguage [A]ction' })
 
 vim.keymap.set('n', '<leader>lrb', function()
-  vim.cmd ':LspStop'
+  vim.cmd ':lsp disable'
   vim.cmd ':w'
   vim.cmd ':e' -- refresh the buffer re-triggers LSPs to start
 end, { desc = '[L]anguage [R]e[B]oot' })
@@ -126,13 +104,6 @@ vim.filetype.add {
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
--- Disabled keys
-vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
-vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
-vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
-vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-vim.keymap.set('n', '<CR>', '<cmd>echo "Dont use enter in normal mode"<CR>')
 vim.keymap.set('n', 'q', '<cmd>echo "disabled q to stop recording mishaps"<CR>')
 
 local function normal_and_visual_keymap(letter, mapping, desc)
