@@ -124,17 +124,96 @@ require('snacks').setup {
     enabled = true,
     preset = {
       keys = {},
-      header = [[
-███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
-████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║
-██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║
-██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║
-██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║
-╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝]],
+      header = (function()
+        -- Use os.date('*t') to get local time, which respects system timezone/DST
+        local est = os.date '*t'
+        local hour = est.hour
+        local ampm = hour >= 12 and 'PM' or 'AM'
+        local h12 = hour % 12
+        if h12 == 0 then h12 = 12 end
+        local min = est.min
+
+        local R = 8
+        local PAD = 4
+        local W = R * 4 + 1 + PAD * 2
+        local H = R * 2 + 1 + PAD
+        local cx, cy = R * 2 + PAD, R + 2
+        local grid = {}
+        for y = 0, H - 1 do
+          grid[y] = {}
+          for x = 0, W - 1 do
+            grid[y][x] = ' '
+          end
+        end
+
+        -- draw circle
+        local nums = { '12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11' }
+        for i = 0, 59 do
+          local angle = (i / 60) * 2 * math.pi - math.pi / 2
+          local x = math.floor(cx + (R * 2) * math.cos(angle) + 0.5)
+          local y = math.floor(cy + R * math.sin(angle) + 0.5)
+          if x >= 0 and x < W and y >= 0 and y < H then
+            if i % 5 == 0 then
+              grid[y][x] = '●'
+            elseif grid[y][x] == ' ' then
+              grid[y][x] = '·'
+            end
+          end
+        end
+
+        -- place hour numbers
+        for i, num in ipairs(nums) do
+          local angle = ((i - 1) / 12) * 2 * math.pi - math.pi / 2
+          local x = math.floor(cx + (R * 2 + 2) * math.cos(angle) + 0.5)
+          local y = math.floor(cy + (R + 1) * math.sin(angle) + 0.5)
+          if y >= 0 and y < H then
+            if #num == 2 then
+              if x - 1 >= 0 and x < W then
+                grid[y][x - 1] = num:sub(1, 1)
+                grid[y][x] = num:sub(2, 2)
+              end
+            else
+              if x >= 0 and x < W then grid[y][x] = num end
+            end
+          end
+        end
+
+        -- draw hand
+        local function draw_hand(angle, len, ch)
+          for t = 1, len * 4 do
+            local frac = t / (len * 4)
+            local x = math.floor(cx + (len * 2) * frac * math.cos(angle) + 0.5)
+            local y = math.floor(cy + len * frac * math.sin(angle) + 0.5)
+            if x >= 0 and x < W and y >= 0 and y < H then grid[y][x] = ch end
+          end
+        end
+
+        -- minute hand
+        local min_angle = (min / 60) * 2 * math.pi - math.pi / 2
+        draw_hand(min_angle, R - 1, '◦')
+
+        -- hour hand
+        local hour_angle = ((hour % 12 + min / 60) / 12) * 2 * math.pi - math.pi / 2
+        draw_hand(hour_angle, R - 3, '•')
+
+        -- center dot
+        grid[cy][cx] = '◎'
+
+        local lines = {}
+        for y = 0, H - 1 do
+          local row = {}
+          for x = 0, W - 1 do
+            table.insert(row, grid[y][x])
+          end
+          table.insert(lines, table.concat(row))
+        end
+        table.insert(lines, '')
+        table.insert(lines, string.format('%d:%02d %s', h12, min, ampm))
+        return table.concat(lines, '\n')
+      end)(),
     },
     sections = {
       { section = 'header' },
-      { section = 'terminal', cmd = 'fortune -s | cowsay -r', padding = 1, indent = 8, ttl = 0, height = 20 },
     },
   },
   explorer = { enabled = true, replace_netrw = false },
@@ -191,7 +270,7 @@ vim.keymap.set('n', '<leader>sr', function() Snacks.picker.resume() end, { desc 
 vim.keymap.set('n', '<leader>ss', function() Snacks.picker.pickers() end, { desc = 'Snacks' })
 vim.keymap.set('n', '<leader>se', function() Snacks.picker.files { hidden = true, ignored = true, title = 'Everything' } end, { desc = 'Everything' })
 vim.keymap.set({ 'n', 'v' }, '<leader>st', open_toolbox, { desc = '[S]earch [T]oolbox' })
-vim.keymap.set('n', '<leader>iF', function() Snacks.picker.explorer { hidden = true, ignored = true } end, { desc = 'File tree' })
+vim.keymap.set('n', '<leader>if', function() Snacks.picker.explorer { hidden = true, ignored = true } end, { desc = 'File tree' })
 -- LSP pickers
 vim.keymap.set('n', 'gd', function() Snacks.picker.lsp_definitions() end, { desc = 'Goto Definition' })
 vim.keymap.set('n', 'gD', function() Snacks.picker.lsp_declarations() end, { desc = 'Goto Declaration' })

@@ -60,18 +60,20 @@ vim.api.nvim_create_autocmd('PackChanged', {
 --    Update plugins with `:lua vim.pack.update()`
 --    Plugin configs are in plugin/*.lua (auto-sourced after init.lua)
 vim.pack.add {
-  'https://github.com/folke/snacks.nvim',
+  { src = 'https://github.com/folke/snacks.nvim' },
+  { src = 'https://github.com/folke/lazydev.nvim' }, -- configures Lua LSP for your Neovim config, runtime and plugins
+
+  { src = 'https://github.com/echasnovski/mini.files' },
+  { src = 'https://github.com/echasnovski/mini.ai' }, -- Better Around/Inside textobjects
+  { src = 'https://github.com/echasnovski/mini.surround' }, -- Add/delete/replace surroundings (brackets, quotes, etc.)
+
   { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range '1.x' }, -- use a release tag to download pre-built binaries
-  'https://github.com/rafamadriz/friendly-snippets',
-  'https://github.com/folke/lazydev.nvim', -- configures Lua LSP for your Neovim config, runtime and plugins
+  { src = 'https://github.com/rafamadriz/friendly-snippets' },
   { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' }, -- functions for installing, updating, and removing tree-sitter parsers
-  'https://github.com/folke/flash.nvim',
-  'https://github.com/echasnovski/mini.files',
-  'https://github.com/echasnovski/mini.ai', -- Better Around/Inside textobjects
-  'https://github.com/echasnovski/mini.surround', -- Add/delete/replace surroundings (brackets, quotes, etc.)
-  'https://github.com/sindrets/diffview.nvim', -- Diff integration
-  'https://github.com/MagicDuck/grug-far.nvim',
-  'https://github.com/hat0uma/csvview.nvim',
+
+  { src = 'https://github.com/sindrets/diffview.nvim' }, -- Diff integration
+  { src = 'https://github.com/MagicDuck/grug-far.nvim' },
+  { src = 'https://github.com/hat0uma/csvview.nvim' },
 }
 
 -- Better Around/Inside textobjects
@@ -132,8 +134,7 @@ vim.keymap.set('n', '<leader>la', vim.lsp.buf.code_action, { desc = '[L]anguage 
 
 vim.keymap.set('n', '<leader>lrb', function()
   vim.cmd ':lsp disable'
-  vim.cmd ':w'
-  vim.cmd ':e' -- refresh the buffer re-triggers LSPs to start
+  vim.cmd ':lsp enable'
 end, { desc = '[L]anguage [R]e[B]oot' })
 
 vim.api.nvim_create_user_command('LspInfo', function() vim.cmd 'checkhealth vim.lsp' end, { desc = 'Show LSP info via checkhealth' })
@@ -167,6 +168,19 @@ normal_and_visual_keymap('c', '"ac', 'Make change leave clipboard alone')
 normal_and_visual_keymap('x', '"_x', 'Make delete 1 character leave clipboard alone')
 vim.api.nvim_set_keymap('n', 'z', '<C-o>', {})
 vim.api.nvim_set_keymap('n', 'Z', '<C-i>', {})
+
+vim.keymap.set(
+  'v',
+  '<CR>',
+  function() require('vim.treesitter._select').select_parent(vim.v.count1) end,
+  { desc = 'Expand visual selection to parent treesitter node' }
+)
+
+vim.keymap.set('n', 'vv', function()
+  vim.cmd 'normal! v'
+  require('vim.treesitter._select').select_parent(vim.v.count1)
+  vim.cmd 'normal! o'
+end, { desc = 'Visual select parent treesitter node with cursor at other end' })
 
 vim.keymap.set('n', 'cx', 'r') -- keep all changes under c
 vim.keymap.set('c', 'Q', 'q') -- fix typos of Capital Q

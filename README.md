@@ -13,17 +13,9 @@ However this configuration is very far from that.
 - Mini for floating file explorer
 - Snacks for pickers (Improvement over telescope)
 - Blink cmp for completions (improvement over nvim-cmp)
-- Flash for jumping around and quickly selecting within a given scope
 - Git diff view (self explanatory)
 
-## Things to install first outside of neovim
+## External dependencies / things to install outside of neovim
 - tree-sitter-cli (tree sitter)
 - ripgrep (grugfar, and a couple others)
-- fortune (dashboard)
-- cowsay (dashboard) 
-
-## TODO
-- When next neovim version comes out replace lazy plugin manager with `vim.pack`
-
-## LSP management
-- I now use 'mise-en-place' to manage LSPs and many other versioned things on my computer, but Mason is a fine alternative
+- LSPs: I now use 'mise-en-place' to manage LSPs and many other versioned things on my computer, but Mason is a fine alternative

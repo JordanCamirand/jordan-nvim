@@ -36,7 +36,7 @@ require('diffview').setup {
           if choice == 1 then
             vim.cmd 'wincmd l'
             vim.cmd 'wincmd l'
-            vim.cmd ':Git checkout -- %'
+            vim.cmd ':! git checkout -- %'
           end
         end,
         { desc = 'Prompt Revert Changes' },
@@ -53,17 +53,6 @@ require('diffview').setup {
           end
         end,
         { desc = 'Prompt Delete File' },
-      },
-      {
-        'n',
-        'c',
-        function()
-          local choice = vim.fn.confirm('Start safe commit?', '&Yes\n&No', 2)
-          if choice == 1 then
-            vim.cmd ':Git fetch'
-            vim.cmd ':Git pull'
-          end
-        end,
       },
     },
   },
